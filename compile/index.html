@@ -1,0 +1,163 @@
+<!DOCTYPE html><html lang="zh-Hans"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><meta name="description" content="编译报错总结"><meta name="keywords" content=""><meta name="author" content="Yan Zhang,undefined"><meta name="copyright" content="Yan Zhang"><title>编译报错总结 | OpenFOAM 成长之路</title><link rel="shortcut icon" href="/album/linktocat.ico"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@3.6.0/css/reveal.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@3.6.0/css/theme/night.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@3.6.0/lib/css/zenburn.min.css"><meta name="generator" content="Hexo 4.2.1"><link rel="alternate" href="/atom.xml" title="OpenFOAM 成长之路" type="application/atom+xml"></head><body><div class="reveal"><div class="slides"><section data-markdown="" data-separator="===" data-separator-vertical="==" data-charset="utf-8"><script type="text/template"><!-- hexo-inject:begin --><!-- hexo-inject:end -->OpenFOAM 编译报错集锦
+
+
+
+===
+
+
+<!-- .slide: data-background="#49B1F5" -->
+<p style="font-family:verdana;color:white;font-size:20px;text-align:left">
+下边这个 `T` 是一个 `const` 引用，但我这里要给它赋值，所以报错。
+</p>
+
+<p style="font-family:verdana;color:white;font-size:20px;text-align:left">
+solution：`thermo` 库有两个版本的 `T()`，使用非 `const` 那个即可，即在 `solver` 中定义 `T` 时，使用 `volScalarField& T = thermo.T();`
+</p>
+
+```C++
+YEEqn.H:86:6: error: 
+passing ‘const volScalarField 
+{aka const GeometricField<double, fvPatchField, volMesh>}’ 
+as ‘this’ argument discards qualifiers [-fpermissive]
+
+     T=G;
+```
+===
+
+
+
+<!-- .slide: data-background="#49B1F5" -->
+<p style="font-family:verdana;color:white;font-size:20px;text-align:left">
+这里 `radiation` 是一个 `autoPtr`，而我要把它转换类型它的派生类。
+</p>
+<p style="font-family:verdana;color:white;font-size:20px;text-align:left">
+solution：在 `radiation` 后边加一个 `()` 即可。`autoPtr` 加括号返回正常的指针。
+</p>
+```C++
+YEEqn.H:85:61: error: 
+cannot dynamic_cast ‘radiation’ 
+(of type ‘class autoPtr<radiation::radiationModel>’) 
+to type ‘const class radiation::fvDOM&’ 
+(source type is not polymorphic)
+
+ T=pow(dynamic_cast<const radiation::fvDOM &>(radiation).G()/4,0.25);
+```
+===
+
+
+<!-- .slide: data-background="#49B1F5" -->
+<p style="font-family:verdana;color:white;font-size:20px;text-align:left">
+库中函数只申明，没有定义，就会出现这个错误。
+</p>
+```C++
+undefined reference to 'Foam::functionName()'
+```
+===
+
+
+<!-- .slide: data-background="#49B1F5" -->
+<p style="font-family:verdana;color:white;font-size:20px;text-align:left">
+这里的 `R(Yi)` 是 ``tmp,fvMatrix,scalar,,``，不能和 `volScalarField`（或者 `scalar`） 相乘。
+</p>
+<p style="font-family:verdana;color:white;font-size:20px;text-align:left">
+solution：很简单，`scalar` 放前边就行了。。。即：`efficiency_/TF_*reaction->R(Yi)`。因为 `scalar*fvMatrix` 是允许的！！！
+</p>
+
+```C++
+YEqn.H(30): error: no operator "*" matches these operands
+In file included from reactingFoam.C(76):
+operand types are: 
+Foam::tmp<Foam::fvMatrix<Foam::scalar>> * Foam::volScalarField 
+In file included from reactingFoam.C(76):
+
+reaction->R(Yi)*efficiency_/TF_
+```
+===
+
+
+
+<!-- .slide: data-background="#49B1F5" -->
+<p style="font-family:verdana;color:white;font-size:20px;text-align:left">
+因为 ``timeSteps_`` 是基类中的 ``private`` 变量，而私有变量只能基类自己内部使用。
+</p>
+<p style="font-family:verdana;color:white;font-size:20px;text-align:left">
+solution：我是这样做的：在基类中，将这个变量从 ``private`` 改成 ``protected``。
+</p>
+
+```C++
+lnInclude/TDACCCMChemistryModel.C(709): error #308: member 
+"TDACChemistryModel<ReactionThermo, ThermoType>::timeSteps_ 
+[with ReactionThermo=psiReactionThermo, ThermoType=gasHThermoPhysics]" 
+(declared at line 90 of "lnInclude/TDACChemistryModel.H") is inaccessible
+      
+this->timeSteps_++;
+```
+===
+
+
+<!-- .slide: data-background="#49B1F5" -->
+```C++
+WMspray/WMspray.C(299): error: dynamic_cast cannot cast away const 
+or other type qualifiers   
+basicSprayCloud& spray_ = dynamic_cast< basicSprayCloud&>(this->mesh()
+.objectRegistry::lookupObject<sprayCloud>(Foam::sprayCloud::typeName));
+```
+
+<p style="font-family:verdana;color:white;font-size:20px;text-align:left">
+代码改为以下即可，因为 ``lookupObject`` 得到的对象是 ``const``。``lookupObjectRef`` 得到的才是可以修改的。
+</p>
+```C++
+basicSprayCloud& spray_ = dynamic_cast< basicSprayCloud&>(this->mesh()
+.objectRegistry::lookupObjectRef<sprayCloud>(Foam::sprayCloud::typeName));  
+```
+===
+
+
+<!-- .slide: data-background="#49B1F5" -->
+```C++
+~/OpenFOAM/OpenFOAM-2.3.x/src/finiteVolume/lnInclude/cyclicAMIFvPatch.H(39): 
+catastrophic error: cannot open source file "cyclicAMILduInterface.H"  
+#include "cyclicAMILduInterface.H"
+```
+
+<p style="font-family:verdana;color:white;font-size:20px;text-align:left">
+这是因为旧版本的代码在 OF23x 中编译，解决方法是在 EXE_INC 中加入 ``-I$(LIB_SRC)/meshTools/lnInclude``。
+</p>
+===
+
+
+<!-- .slide: data-background="#49B1F5" -->
+```C++
+Post.C(70): error: name followed by "::" must be a class or namespace name
+```
+
+<p style="font-family:verdana;color:white;font-size:20px;text-align:left">
+这是因为没有 include 双冒号后边类的头文件。
+</p>
+===
+
+
+<!-- .slide: data-background="#49B1F5" -->
+```C++
+findMax.C(212): error: ABC is not a template
+```
+
+<p style="font-family:verdana;color:white;font-size:20px;text-align:left">
+需要 include ``ABC`` 的头文件，如果已经 include 了它的头文件，依然出现这个错误。那么检查 ``ABC`` 是否处于另一个命名空间里边。
+</p>
+===
+
+
+<!-- .slide: data-background="#49B1F5" -->
+```C++
+findMax.C(235): error: the operand of a runtime dynamic_cast must have a 
+polymorphic class type  dynamic_cast<const ABC& >(objectName).functionName()
+```
+
+<p style="font-family:verdana;color:white;font-size:20px;text-align:left">
+可能是因为 ``objectName`` 是 ``autoPtr``，需要在它后边加 ``()``。
+</p>
+===
+
+
+<!-- .slide: data-background="#49B1F5" --></script></section></div></div><script src="https://cdn.jsdelivr.net/npm/reveal.js@3.6.0/lib/js/head.min.js"></script><script src="https://cdn.jsdelivr.net/npm/reveal.js@3.6.0/js/reveal.min.js"></script><script>Reveal.initialize({mouseWheel:!0,transition:"slide",transitionSpeed:"default",parallaxBackgroundImage:"",parallaxBackgroundSize:"",parallaxBackgroundHorizontal:"",parallaxBackgroundVertical:"",markdown:{smartypants:!0},dependencies:[{src:"/js/third-party/reveal/marked.min.js",condition:function(){return!!document.querySelector("[data-markdown]")}},{src:"/js/third-party/reveal/markdown.min.js",condition:function(){return!!document.querySelector("[data-markdown]")}},{src:"/js/third-party/reveal/highlight.min.js",async:!0,callback:function(){setTimeout(function(){hljs.initHighlighting()},0)}},{src:"/js/third-party/reveal/zoom.min.js",async:!0},{src:"/js/third-party/reveal/notes.min.js",async:!0},{src:"/js/third-party/reveal/math.min.js",async:!0}]})</script></body></html>

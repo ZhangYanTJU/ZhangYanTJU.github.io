@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://openfoam.top/release/</loc>
+    
+    <lastmod>2020-07-21T22:00:00.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://openfoam.top/parallellyReconstructPar/</loc>
     
     <lastmod>2020-07-16T22:00:00.000Z</lastmod>
@@ -19,13 +26,6 @@
     <loc>https://openfoam.top/paraviewMesh/</loc>
     
     <lastmod>2020-07-07T22:00:00.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://openfoam.top/release/</loc>
-    
-    <lastmod>2020-06-29T22:00:00.000Z</lastmod>
     
   </url>
   
@@ -299,13 +299,6 @@
     <loc>https://openfoam.top/dynLES/</loc>
     
     <lastmod>2018-05-28T22:00:00.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://openfoam.top/gallery/index.html</loc>
-    
-    <lastmod>2018-05-26T01:50:01.000Z</lastmod>
     
   </url>
   

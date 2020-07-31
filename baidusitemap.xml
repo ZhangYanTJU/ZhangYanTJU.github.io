@@ -4,10 +4,10 @@
     <loc>https://openfoam.top/turb/</loc>
     <lastmod>2020-07-22</lastmod>
   </url>  <url>
-    <loc>https://openfoam.top/thermodynamicLIB/</loc>
+    <loc>https://openfoam.top/release/</loc>
     <lastmod>2020-07-21</lastmod>
   </url>  <url>
-    <loc>https://openfoam.top/release/</loc>
+    <loc>https://openfoam.top/thermodynamicLIB/</loc>
     <lastmod>2020-07-21</lastmod>
   </url>  <url>
     <loc>https://openfoam.top/parallellyReconstructPar/</loc>
@@ -67,10 +67,10 @@
     <loc>https://openfoam.top/programmingNote/</loc>
     <lastmod>2019-08-24</lastmod>
   </url>  <url>
-    <loc>https://openfoam.top/spraySubModels/</loc>
+    <loc>https://openfoam.top/markdownLearning/</loc>
     <lastmod>2019-08-03</lastmod>
   </url>  <url>
-    <loc>https://openfoam.top/markdownLearning/</loc>
+    <loc>https://openfoam.top/spraySubModels/</loc>
     <lastmod>2019-08-03</lastmod>
   </url>  <url>
     <loc>https://openfoam.top/mixture/</loc>
@@ -109,10 +109,10 @@
     <loc>https://openfoam.top/CppPrimer/</loc>
     <lastmod>2018-05-02</lastmod>
   </url>  <url>
-    <loc>https://openfoam.top/RANS_LES/</loc>
+    <loc>https://openfoam.top/alpha/</loc>
     <lastmod>2018-04-04</lastmod>
   </url>  <url>
-    <loc>https://openfoam.top/alpha/</loc>
+    <loc>https://openfoam.top/RANS_LES/</loc>
     <lastmod>2018-04-04</lastmod>
   </url>  <url>
     <loc>https://openfoam.top/mechanisms/</loc>

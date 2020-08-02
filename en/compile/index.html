@@ -1,0 +1,72 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><meta name="description" content="errors and solutions when compiling your own code"><meta name="keywords" content=""><meta name="author" content="Yan Zhang,undefined"><meta name="copyright" content="Yan Zhang"><title>errors and solutions when compiling your own code | OpenFOAM using &amp; programming skills</title><link rel="shortcut icon" href="/en/album/linktocat.ico"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@3.6.0/css/reveal.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@3.6.0/css/theme/night.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@3.6.0/lib/css/zenburn.min.css"><meta name="generator" content="Hexo 4.2.1"><link rel="alternate" href="/en/atom.xml" title="OpenFOAM using & programming skills" type="application/atom+xml">
+<!-- hexo-inject:begin --><!-- hexo-inject:end --></head><body><div class="reveal"><div class="slides"><section data-markdown="" data-separator="===" data-separator-vertical="==" data-charset="utf-8"><script type="text/template"><!-- hexo-inject:begin --><!-- hexo-inject:end -->### collections about errors and solutions when compiling your own OpenFOAM code
+===
+
+
+<!-- .slide: data-background="#49B1F5" -->
+<p style="font-family:verdana;color:white;font-size:20px;text-align:left">
+The `T` is a const refrence, but I want to assign a value to it.
+</p>
+
+<p style="font-family:verdana;color:white;font-size:20px;text-align:left">
+solution: there are non-const `T()` in `thermo` library, use this version of `T()` when define your `T` in your OpenFOAM solver.
+i.e. `volScalarField& T = thermo.T();`
+</p>
+
+```C++
+YEEqn.H:86:6: error: 
+passing ‘const volScalarField 
+{aka const GeometricField<double, fvPatchField, volMesh>}’ 
+as ‘this’ argument discards qualifiers [-fpermissive]
+     T=G;
+```
+===
+
+
+
+<!-- .slide: data-background="#49B1F5" -->
+<p style="font-family:verdana;color:white;font-size:20px;text-align:left">
+The `radiation` is an `autoPtr`, but I want to convert it to its derived class.
+</p>
+<p style="font-family:verdana;color:white;font-size:20px;text-align:left">
+solution: use `radiation()` instead of `radiation`. The `()` returns reference to the object data.
+</p>
+```
+YEEqn.H:85:61: error: 
+cannot dynamic_cast ‘radiation’ 
+(of type ‘class autoPtr<radiation::radiationModel>’) 
+to type ‘const class radiation::fvDOM&’ 
+(source type is not polymorphic)
+ T=pow(dynamic_cast<const radiation::fvDOM &>(radiation).G()/4,0.25);
+```
+===
+
+
+<!-- .slide: data-background="#49B1F5" -->
+<p style="font-family:verdana;color:white;font-size:20px;text-align:left">
+Forget to define some functions in library with just declaration.
+</p>
+![](//ws2.sinaimg.cn/large/a2a8de49ly1fs84vnrcjmj20xt056q41.jpg)
+===
+
+
+<!-- .slide: data-background="#49B1F5" -->
+<p style="font-family:verdana;color:white;font-size:20px;text-align:left">
+The `R(Yi)` is ``tmp,fvMatrix,scalar,,``, it doesn't overload the operator `*` with `volScalarField` or `scalar`.
+</p>
+<p style="font-family:verdana;color:white;font-size:20px;text-align:left">
+solution: but `scalar` overload the operator `*` with ``tmp,fvMatrix,scalar,,``. i.e. you can use `efficiency_/TF_*reaction->R(Yi)`.
+</p>
+
+```C++
+YEqn.H(30): error: no operator "*" matches these operands
+In file included from reactingFoam.C(76):
+operand types are: 
+Foam::tmp<Foam::fvMatrix<Foam::scalar>> * Foam::volScalarField 
+In file included from reactingFoam.C(76):
+reaction->R(Yi)*efficiency_/TF_
+compilation aborted for reactingFoam.C (code 2)
+make: *** [Make/linux64IccDPOpt/reactingFoam.o] error 2
+```
+===
+<!-- .slide: data-background="#49B1F5" --></script></section></div></div><script src="https://cdn.jsdelivr.net/npm/reveal.js@3.6.0/lib/js/head.min.js"></script><script src="https://cdn.jsdelivr.net/npm/reveal.js@3.6.0/js/reveal.min.js"></script><script>Reveal.initialize({mouseWheel:!0,transition:"slide",transitionSpeed:"default",parallaxBackgroundImage:"",parallaxBackgroundSize:"",parallaxBackgroundHorizontal:"",parallaxBackgroundVertical:"",markdown:{smartypants:!0},dependencies:[{src:"/js/third-party/reveal/marked.min.js",condition:function(){return!!document.querySelector("[data-markdown]")}},{src:"/js/third-party/reveal/markdown.min.js",condition:function(){return!!document.querySelector("[data-markdown]")}},{src:"/js/third-party/reveal/highlight.min.js",async:!0,callback:function(){setTimeout(function(){hljs.initHighlighting()},0)}},{src:"/js/third-party/reveal/zoom.min.js",async:!0},{src:"/js/third-party/reveal/notes.min.js",async:!0},{src:"/js/third-party/reveal/math.min.js",async:!0}]})</script><!-- hexo-inject:begin --><!-- hexo-inject:end --></body></html>

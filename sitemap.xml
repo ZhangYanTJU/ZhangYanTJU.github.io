@@ -16,14 +16,14 @@
   </url>
   
   <url>
-    <loc>https://openfoam.top/release/</loc>
+    <loc>https://openfoam.top/thermodynamicLIB/</loc>
     
     <lastmod>2020-07-21T22:00:00.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://openfoam.top/thermodynamicLIB/</loc>
+    <loc>https://openfoam.top/release/</loc>
     
     <lastmod>2020-07-21T22:00:00.000Z</lastmod>
     
@@ -58,14 +58,14 @@
   </url>
   
   <url>
-    <loc>https://openfoam.top/gsl/</loc>
+    <loc>https://openfoam.top/boost/</loc>
     
     <lastmod>2020-06-01T22:00:00.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://openfoam.top/boost/</loc>
+    <loc>https://openfoam.top/gsl/</loc>
     
     <lastmod>2020-06-01T22:00:00.000Z</lastmod>
     

@@ -4,10 +4,10 @@
     <loc>https://openfoam.top/turb/</loc>
     <lastmod>2020-07-22</lastmod>
   </url>  <url>
-    <loc>https://openfoam.top/release/</loc>
+    <loc>https://openfoam.top/thermodynamicLIB/</loc>
     <lastmod>2020-07-21</lastmod>
   </url>  <url>
-    <loc>https://openfoam.top/thermodynamicLIB/</loc>
+    <loc>https://openfoam.top/release/</loc>
     <lastmod>2020-07-21</lastmod>
   </url>  <url>
     <loc>https://openfoam.top/parallellyReconstructPar/</loc>
@@ -22,10 +22,10 @@
     <loc>https://openfoam.top/matplotlib/</loc>
     <lastmod>2020-06-04</lastmod>
   </url>  <url>
-    <loc>https://openfoam.top/gsl/</loc>
+    <loc>https://openfoam.top/boost/</loc>
     <lastmod>2020-06-01</lastmod>
   </url>  <url>
-    <loc>https://openfoam.top/boost/</loc>
+    <loc>https://openfoam.top/gsl/</loc>
     <lastmod>2020-06-01</lastmod>
   </url>  <url>
     <loc>https://openfoam.top/T_calculate/</loc>

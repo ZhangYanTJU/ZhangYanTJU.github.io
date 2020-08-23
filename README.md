@@ -2,6 +2,6 @@
 
 [ZhangYanTJU.github.io](https://ZhangYanTJU.github.io)
 
-[ZhangYanTJU.coding.me](https://ZhangYanTJU.coding.me)
+[ZhangYanTJU.coding.me](https://tc93mv.coding-pages.com)
 
-[ZhangYanTJU.gitee.io](https://zhangyantju.gitee.io/)
+[ZhangYanTJU.gitee.io](https://zhangyantju.gitee.io)

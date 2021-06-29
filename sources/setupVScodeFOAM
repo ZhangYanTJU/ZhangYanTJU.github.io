@@ -1,0 +1,105 @@
+#!/usr/bin/env python3
+#------------------------------------------------------------------------------
+# =========                 |
+# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+#  \\    /   O peration     |
+#   \\  /    A nd           | www.openfoam.com
+#    \\/     M anipulation  |
+#------------------------------------------------------------------------------
+#     Copyright (C) 2011-2016 OpenFOAM Foundation
+#     Copyright (C) 2017-2020 OpenCFD Ltd.
+#------------------------------------------------------------------------------
+# License
+#     This file is part of OpenFOAM.
+#
+#     OpenFOAM is free software: you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#     for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Script
+#     setupVScode
+#
+# Description
+#     Sets up Visual Studio Code for use with OpenFOAM by writing correct
+#     settings into .vscode/.settings .
+#     You can see the settings that we set in the good_settings variable below.
+#
+#------------------------------------------------------------------------------
+import os
+import sys
+import json
+import argparse
+
+parser = argparse.ArgumentParser(
+    description="Sets this directory or a workspace up for using Visual Studio Code with Openfoam. "
+                "Take a look at https://openfoamwiki.net/index.php/HowTo_Use_OpenFOAM_with_Visual_Studio_Code for more information.")
+parser.add_argument("--generate-workspace", action="store_true",
+                    help="Generates a openfoam.code-workspace file instead of setting up the current working directory")
+args = parser.parse_args()
+
+workspacegen = args.generate_workspace
+
+assert "FOAM_LIBBIN" in os.environ, os.path.basename(sys.argv[0]) + " error: environment variable FOAM_LIBBIN not set"
+
+if not workspacegen:
+    if not os.path.exists(".vscode"):
+        os.mkdir(".vscode")
+    assert os.path.isdir(".vscode"), "The path .vscode already exists and it is not a directory."
+
+outpath = "openfoam.code-workspace" if workspacegen else ".vscode/settings.json"
+if os.path.exists(outpath):
+    assert os.path.isfile(outpath), outpath + " is not a file."
+    try:
+        jsondata = json.load(open(outpath, "r"))
+    except json.decoder.JSONDecodeError as exc:
+        print(exc)
+        print(outpath + " is not a valid json file (see exception above). Remove or fix this file then run setupVSCode again.")
+        sys.exit(1)
+else:
+    jsondata = json.loads("{}")
+
+if workspacegen and "settings" not in jsondata:
+    jsondata["settings"] = json.loads("{}")
+
+if workspacegen:
+    settings = jsondata["settings"]
+else:
+    settings = jsondata
+
+good_settings = json.loads("{}")
+good_settings["ccls.cache.directory"] = os.path.join(os.environ["FOAM_LIBBIN"], "..", "ccls-cache")
+good_settings["ccls.misc.compilationDatabaseDirectory"] = os.path.join(os.getenv("FOAM_LIBBIN"), "..")
+good_settings["C_Cpp.autocomplete"] = "Disabled"
+good_settings["C_Cpp.formatting"] = "Disabled"
+good_settings["C_Cpp.errorSquiggles"] = "Disabled"
+good_settings["C_Cpp.intelliSenseEngine"] = "Disabled"
+
+settings_already_good = True
+for el in good_settings:
+    if el not in settings or settings[el] != good_settings[el]:
+        settings_already_good = False
+        settings[el] = good_settings[el]
+
+if workspacegen:
+    jsondata["settings"] = settings
+
+if settings_already_good:
+    if workspacegen:
+        print("The vs-code settings for " + outpath + " are already set correctly.")
+    else:
+        print("The vs-code settings for this folder are already set correctly.")
+else:
+    json.dump(jsondata, open(outpath, "w"), indent=4, sort_keys=False)
+    if workspacegen:
+        print("The vs-code settings for " + outpath + " are now set correctly.")
+    else:
+        print("The vs-code settings for this folder are now set correctly.")
